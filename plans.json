@@ -1,17 +1,1 @@
-[
-  {
-    "id": 1,
-    "name": "Nico",
-    "offer": false
-  },
-  {
-    "id": 2,
-    "name": "Melu",
-    "offer": true
-  },
-  {
-    "id": 3,
-    "name": "Eze",
-    "offer": true
-  }
-]
+[{'id': '1', 'name': 'Nicolas', 'offer': True}, {'id': '2', 'name': 'Melu', 'offer': True}, {'id': '3', 'name': 'Eze', 'offer': True}]
