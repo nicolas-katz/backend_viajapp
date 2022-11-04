@@ -65,7 +65,7 @@ def createPlan():
 
 @app.route('/api/v1/edit_plan/<int:plan_id>', methods=["PUT"])
 def editPlan(plan_id):
-    return 'en proceso'
+    return 'En proceso'
 
 @app.route('/api/v1/plans/<int:plan_id>', methods=["DELETE"])
 def deletePlan(plan_id):
