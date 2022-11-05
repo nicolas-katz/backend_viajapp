@@ -113,5 +113,5 @@ def deletePlan(plan_id):
     except:
         return 'Hubo un error eliminando el plan con id: ' + plan_id
 
-if __name__ == '_main_':
+if __name__ == '__main__':
     app.run(None, 3000, True)
