@@ -1,15 +1,19 @@
+import flask
 from flask import Flask, render_template
 from flask_cors import CORS
 import json
+import uuid
 
 app = Flask(__name__)
 CORS(app)
 
 def getDatabase():
-    with open('./plans.json', 'r') as file:
-        data = json.loads(file.read())
-    return data
-
+    with open('plans.json', 'r') as file:
+        data = file.read()
+    if data:
+        return json.loads(data)
+    else:
+        return []
 @app.route('/')
 def index():
     return render_template('./index.html')
@@ -18,24 +22,22 @@ def index():
 def getAllPlans():
     try:
         data = getDatabase()
-        if len(data) > 0:
-            return data
-        else:
-            return 'No existe ningún plan actualmente.'
+        if len(data) == 0:
+            with open('plans.json', 'w') as file:
+                file.write(str(data))
+        return data
     except:
         return 'Hubo un error buscando todos los planes.'
 
-@app.route('/api/v1/plans/<int:plan_id>', methods=["GET"])
+@app.route('/api/v1/plans/<plan_id>', methods=["GET"])
 def getPlanById(plan_id):
     try:
-        filteredData = ''
+        filteredData = []
         data = getDatabase()
-        if len(data) > 0:
+        if type(data) == list and len(data) > 0:
             for item in data:
                 if item["id"] == plan_id:
                     filteredData = item
-                else:
-                    return 'No existe un plan con el id: ' + str(plan_id)
             return filteredData
         else:
             return 'No existe ningún plan actualmente.'
@@ -47,42 +49,69 @@ def getPlansWithOffers():
     try:
         filteredData = []
         data = getDatabase()
-        if len(data) > 0:
+        if data:
             for item in data:
                 if item["offer"]:
                     filteredData.append(item)
-                else:
-                    'Hubo un error buscando todos los planes con oferta.'
             return filteredData
         else:
             return 'No existe ningún plan actualmente.'
     except:
         return 'Hubo un error buscando todos los planes con oferta.'
 
-@app.route('/api/v1/create_plan', methods=["POST"])
+@app.route('/api/v1/plans', methods=["POST"])
 def createPlan():
-    return 'en proceso'
+    try:
+        data = getDatabase()
+        body = json.loads(flask.request.data)
+        body["id"] = uuid.uuid1().hex
+        if type(data) == list:
+            data.append(body)
+            with open('plans.json', 'w') as file:
+                file.write(str(data))
+        else:
+            with open('plans.json', 'w') as file:
+                file.write(str(list(body)))
+        return 'El plan se ha creado correctamente.'
+    except:
+        return 'Hubo un error creando un plan.'
 
-@app.route('/api/v1/edit_plan/<int:plan_id>', methods=["PUT"])
+@app.route('/api/v1/plans/<plan_id>', methods=["PUT"])
 def editPlan(plan_id):
-    return 'En proceso'
+    try:
+        data = getDatabase()
+        body = json.loads(flask.request.data)
+        if type(data) == list and len(data) > 0:
+            for item in data:
+                if item["id"] == plan_id:
+                    item["name"] = body["name"]
+                    item["offer"] = body["offer"]
+            with open('./plans.json', 'w') as file:
+                file.write(str(data))
+            return 'El plan se ha editado correctamente.'
+        else:
+            return 'No existe ningún plan actualmente.'
+    except:
+        return 'Hubo un error editando el plan con id: ' + plan_id
 
-@app.route('/api/v1/plans/<int:plan_id>', methods=["DELETE"])
+@app.route('/api/v1/plans/<plan_id>', methods=["DELETE"])
 def deletePlan(plan_id):
     try:
         filteredData = []
         data = getDatabase()
         if len(data) > 0:
             for item in data:
-                if item["id"] != plan_id:
+                if item["id"] == plan_id:
                     filteredData.append(item)
-            with open('./plans.json', 'w') as file:
-                file.write(str(filteredData))
-            return 'El plan con id ' + str(plan_id) + ' ha sido eliminado correctamente.'
+                    with open('plans.json', 'w') as file:
+                        file.write(str(filteredData))
+                    return 'El plan con id ' + plan_id + ' ha sido eliminado correctamente.'
+                else:
+                    return []
         else:
             return 'No existe ningún plan actualmente.'
     except:
-        return 'Hubo un error eliminando el plan con id: ' + str(plan_id)
+        return 'Hubo un error eliminando el plan con id: ' + plan_id
 
-if __name__ == '__main__':
+if __name__ == '_main_':
     app.run(None, 3000, True)
