@@ -51,7 +51,7 @@ def getPlansWithOffers():
         data = getDatabase()
         if data:
             for item in data:
-                if item["offer"]:
+                if item["offer"] == 1:
                     filteredData.append(item)
             return filteredData
         else:
