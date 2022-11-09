@@ -1,15 +1,16 @@
-import os
-import flask
 from flask import Flask, render_template
 from flask_cors import CORS
-import json
+from db.manager_db import load_plans, load_budgets
+
+import os
+import flask
 import uuid
-from db.manager_db import load_plans
+import json
 
 app = Flask(__name__)
 CORS(app)
-data = load_plans()
-
+plans = load_plans()
+budgets = load_budgets()
 
 @app.route('/')
 def index():
@@ -19,33 +20,67 @@ def index():
 @app.route('/api/v1/plans', methods=["GET"])
 def get_all_plans():
     try:
-        return data
+        return plans
     except:
-        return 'Hubo un error buscando todos los planes.'
+        return []
 
 
 @app.route('/api/v1/plans/<plan_id>', methods=["GET"])
 def get_plan_by_id(plan_id):
     try:
         founded_data = {}
-        for item in data:
+        for item in plans:
             if item["id"] == plan_id:
                 founded_data = item
         return founded_data
     except:
-        return 'Hubo un error buscando el plan con id ' + plan_id + "."
+        return {}
+
+
+@app.route('/api/v1/plans/offers', methods=["GET"])
+def get_offers_plans():
+    try:
+        founded_data = []
+        for item in plans:
+            if item["offer"]:
+                founded_data.append(item)
+        return founded_data
+    except:
+        return []
 
 
 @app.route('/api/v1/plans/popular', methods=["GET"])
 def get_popular_plans():
     try:
         founded_data = []
-        for item in data:
+        for item in plans:
             if item["popular"]:
-                founded_data.append(item)
+                if len(founded_data) < 4:
+                    founded_data.append(item)
         return founded_data
     except:
-        return 'Hubo un error buscando todos los planes populares.'
+        return []
+
+
+@app.route('api/v1/budgets', methods=["GET"])
+def get_all_budgets():
+    try:
+        return budgets
+    except:
+        return []
+
+
+@app.route('/api/v1/budgets', methods=["POST"])
+def create_budget():
+    try:
+        body = json.loads(flask.request.data)
+        body["id"] = uuid.uuid1().hex
+        budgets.append(body)
+        with open('{0}\\db\\budgets.txt'.format(os.getcwd()), 'w') as file:
+            file.write(str(budgets))
+        return budgets
+    except:
+        return []
 
 
 @app.route('/api/v1/plans', methods=["POST"])
@@ -53,47 +88,47 @@ def create_plan():
     try:
         body = json.loads(flask.request.data)
         body["id"] = uuid.uuid1().hex
-        data.append(body)
+        plans.append(body)
         with open('{0}\\db\\plans.txt'.format(os.getcwd()), 'w') as file:
-            file.write(str(data))
-        return 'El plan se ha creado correctamente.'
+            file.write(str(plans))
+        return plans
     except:
-        return 'Hubo un error creando un plan.'
+        return []
 
 
 @app.route('/api/v1/plans/<plan_id>', methods=["PUT"])
 def edit_plan(plan_id):
     try:
         body = json.loads(flask.request.data)
-        if len(data) > 0:
-            for item in data:
+        if len(plans) > 0:
+            for item in plans:
                 if item["id"] == plan_id:
                     item["title"] = body["title"]
                     item["offer"] = body["offer"]
                     item["popular"] = body["popular"]
                     with open('{0}\\db\\plans.txt'.format(os.getcwd()), 'w') as file:
-                        file.write(str(data))
-                    return 'El plan se ha editado correctamente.'
+                        file.write(str(plans))
+                    return plans
         else:
-            return 'No hay ningún plan cargado en nuestra base de datos.'
+            return {}
     except:
-        return 'Hubo un error editando el plan con id: ' + plan_id
+        return {}
 
 
 @app.route('/api/v1/plans/<plan_id>', methods=["DELETE"])
 def delete_plan(plan_id):
     try:
-        if len(data) > 0:
-            for item in data:
+        if len(plans) > 0:
+            for item in plans:
                 if item["id"] == plan_id:
-                    data.remove(item)
+                    plans.remove(item)
                     with open('{0}\\db\\plans.txt'.format(os.getcwd()), 'w') as file:
-                        file.write(str(data))
-                    return 'El plan con id ' + plan_id + ' ha sido eliminado correctamente.'
+                        file.write(str(plans))
+                    return plans
         else:
-            return 'No hay ningún plan cargado en nuestra base de datos.'
+            return {}
     except:
-        return 'Hubo un error eliminando el plan con id: ' + plan_id
+        return {}
 
 
 if __name__ == '__main__':

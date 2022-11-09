@@ -1,10 +1,11 @@
 class Plan:
 
-    def __init__(self, id, title, price, popular, description, img):
+    def __init__(self, id, title, price, popular, offer, description, img):
         self.id = id
         self.title = title
         self.price = price
         self.popular = popular
+        self.offer = offer
         self.description = description
         self.img = img
 
@@ -14,6 +15,7 @@ class Plan:
             'title': self.title,
             'price': self.price,
             'popular': self.popular,
+            'offer': self.offer,
             'description': self.description,
             'img': self.img
         }
