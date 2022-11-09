@@ -2,10 +2,8 @@ from flask import Flask, render_template
 from flask_cors import CORS
 from db.manager_db import load_plans, load_budgets, save_plan, save_budget, update_plan, remove_plan
 
-import os
 import flask
 import uuid
-import json
 
 app = Flask(__name__)
 CORS(app)
