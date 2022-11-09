@@ -1,6 +1,6 @@
 from flask import Flask, render_template
 from flask_cors import CORS
-from db.manager_db import load_plans, load_budgets
+from db.manager_db import load_plans, load_budgets, save_plan, save_budget, update_plan, remove_plan
 
 import os
 import flask
@@ -11,6 +11,7 @@ app = Flask(__name__)
 CORS(app)
 plans = load_plans()
 budgets = load_budgets()
+
 
 @app.route('/')
 def index():
@@ -62,23 +63,14 @@ def get_popular_plans():
         return []
 
 
-@app.route('api/v1/budgets', methods=["GET"])
-def get_all_budgets():
-    try:
-        return budgets
-    except:
-        return []
-
-
-@app.route('/api/v1/budgets', methods=["POST"])
+@app.route('/api/v1/plans', methods=["POST"])
 def create_budget():
     try:
-        body = json.loads(flask.request.data)
+        body = flask.request.json
         body["id"] = uuid.uuid1().hex
-        budgets.append(body)
-        with open('{0}\\db\\budgets.txt'.format(os.getcwd()), 'w') as file:
-            file.write(str(budgets))
-        return budgets
+        save_budget(body)
+
+        return {"id": body["id"]}
     except:
         return []
 
@@ -86,12 +78,11 @@ def create_budget():
 @app.route('/api/v1/plans', methods=["POST"])
 def create_plan():
     try:
-        body = json.loads(flask.request.data)
+        body = flask.request.json
         body["id"] = uuid.uuid1().hex
-        plans.append(body)
-        with open('{0}\\db\\plans.txt'.format(os.getcwd()), 'w') as file:
-            file.write(str(plans))
-        return plans
+        save_plan(body)
+
+        return {"id": body["id"]}
     except:
         return []
 
@@ -99,16 +90,12 @@ def create_plan():
 @app.route('/api/v1/plans/<plan_id>', methods=["PUT"])
 def edit_plan(plan_id):
     try:
-        body = json.loads(flask.request.data)
+        body = flask.request.json
         if len(plans) > 0:
             for item in plans:
                 if item["id"] == plan_id:
-                    item["title"] = body["title"]
-                    item["offer"] = body["offer"]
-                    item["popular"] = body["popular"]
-                    with open('{0}\\db\\plans.txt'.format(os.getcwd()), 'w') as file:
-                        file.write(str(plans))
-                    return plans
+                    update_plan(item["id"], body)
+                    return {'id': item["id"]}
         else:
             return {}
     except:
@@ -122,9 +109,8 @@ def delete_plan(plan_id):
             for item in plans:
                 if item["id"] == plan_id:
                     plans.remove(item)
-                    with open('{0}\\db\\plans.txt'.format(os.getcwd()), 'w') as file:
-                        file.write(str(plans))
-                    return plans
+                    remove_plan(plans)
+                    return {'id': item["id"]}
         else:
             return {}
     except:
