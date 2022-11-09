@@ -1,9 +1,20 @@
 class Plan:
 
-    def __init__(self, id, name, price, offer, description, gallery):
+    def __init__(self, id, title, price, popular, description, img):
         self.id = id
-        self.name = name
+        self.title = title
         self.price = price
-        self.offer = offer
+        self.popular = popular
         self.description = description
-        self.gallery = gallery
+        self.img = img
+
+    def serialize(self):
+        return {
+            'id': self.id,
+            'title': self.title,
+            'price': self.price,
+            'popular': self.popular,
+            'description': self.description,
+            'img': self.img
+        }
+
