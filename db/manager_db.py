@@ -88,7 +88,7 @@ def load_budgets():
 
 def save_budget(budget):
     with open('{0}\\db\\budgets.csv'.format(os.getcwd()), 'a') as file:
-        header = ["id", "name", "email", "phone", "budget", "message"]
+        header = ["id", "name", "email", "phone", "budget", "plan", "message"]
 
         writer = csv.DictWriter(file, fieldnames=header)
 

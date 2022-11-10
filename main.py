@@ -61,7 +61,7 @@ def get_popular_plans():
         return []
 
 
-@app.route('/api/v1/plans', methods=["POST"])
+@app.route('/api/v1/budgets', methods=["POST"])
 def create_budget():
     try:
         body = flask.request.json
@@ -70,7 +70,7 @@ def create_budget():
 
         return {"id": body["id"]}
     except:
-        return []
+        return 'ok'
 
 
 @app.route('/api/v1/plans', methods=["POST"])
