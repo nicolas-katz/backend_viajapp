@@ -49,7 +49,7 @@ def get_offers_plans():
     try:
         founded_data = []
         for item in plans:
-            if item["offer"]:
+            if item["offer"] == "True":
                 founded_data.append(item)
         return founded_data
     except:
@@ -61,7 +61,7 @@ def get_popular_plans():
     try:
         founded_data = []
         for item in plans:
-            if item["popular"]:
+            if item["popular"] == "True":
                 founded_data.append(item)
         return founded_data
     except:
