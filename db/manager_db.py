@@ -83,7 +83,7 @@ def load_budgets():
 
             return budgets
     except:
-        return budgets
+        return 'Ocurrio un error.'
 
 
 def save_budget(budget):

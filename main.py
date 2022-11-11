@@ -24,6 +24,14 @@ def get_all_plans():
         return []
 
 
+@app.route('/api/v1/budgets', methods=["GET"])
+def get_all_budgets():
+    try:
+        return budgets
+    except:
+        return []
+
+
 @app.route('/api/v1/plans/<plan_id>', methods=["GET"])
 def get_plan_by_id(plan_id):
     try:
