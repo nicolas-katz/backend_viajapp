@@ -62,8 +62,7 @@ def get_popular_plans():
         founded_data = []
         for item in plans:
             if item["popular"]:
-                if len(founded_data) < 4:
-                    founded_data.append(item)
+                founded_data.append(item)
         return founded_data
     except:
         return []
@@ -78,7 +77,7 @@ def create_budget():
 
         return {"id": body["id"]}
     except:
-        return 'ok'
+        return []
 
 
 @app.route('/api/v1/plans', methods=["POST"])
